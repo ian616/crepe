@@ -6,11 +6,11 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from argparse import ArgumentTypeError
 
 from .core import process_file
-
+from .core import build_and_load_model
 
 def run(filename, output=None, model_capacity='full', viterbi=False,
         save_activation=False, save_plot=False, plot_voicing=False,
-        no_centering=False, step_size=10, verbose=True):
+        no_centering=False, step_size=10, verbose=True, model_summary=False):
     """
     Collect the WAV files to process and run the model
 
@@ -47,6 +47,10 @@ def run(filename, output=None, model_capacity='full', viterbi=False,
     verbose : bool
         Print status messages and keras progress (default=True).
     """
+
+    if model_summary:
+        build_and_load_model(model_capacity, model_summary)
+        return
 
     files = []
     for path in filename:
@@ -118,7 +122,7 @@ def main():
     parser = ArgumentParser(sys.argv[0], description=main.__doc__,
                             formatter_class=RawDescriptionHelpFormatter)
 
-    parser.add_argument('filename', nargs='+',
+    parser.add_argument('filename', nargs='*',
                         help='path to one ore more WAV file(s) to analyze OR '
                              'can be a directory')
     parser.add_argument('--output', '-o', default=None,
@@ -158,6 +162,8 @@ def main():
                         action='store_true',
                         help='Suppress all non-error printouts (e.g. progress '
                              'bar).')
+    parser.add_argument('--model-summary', action='store_true',
+                        help='Print model summary by provided tensorflow function model.summary()')
 
     args = parser.parse_args()
 
@@ -170,4 +176,5 @@ def main():
         plot_voicing=args.plot_voicing,
         no_centering=args.no_centering,
         step_size=args.step_size,
-        verbose=not args.quiet)
+        verbose=not args.quiet,
+        model_summary=args.model_summary)

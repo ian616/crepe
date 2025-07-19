@@ -22,7 +22,7 @@ models = {
 model_srate = 16000
 
 
-def build_and_load_model(model_capacity):
+def build_and_load_model(model_capacity, model_summary=False):
     """
     Build the CNN model and load the weights
 
@@ -71,6 +71,9 @@ def build_and_load_model(model_capacity):
         y = Dense(360, activation='sigmoid', name="classifier")(y)
 
         model = Model(inputs=x, outputs=y)
+        if model_summary:
+            model.summary()
+            return
 
         package_dir = os.path.dirname(os.path.realpath(__file__))
         filename = "model-{}.h5".format(model_capacity)
